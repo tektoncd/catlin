@@ -1,4 +1,4 @@
-module github.com/tektoncd/plumbing/catlin
+module github.com/tektoncd/catlin
 
 go 1.14
 

@@ -20,7 +20,7 @@ import (
 
 	"gotest.tools/v3/assert"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/parser"
 )
 
 const (

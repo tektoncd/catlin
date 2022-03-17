@@ -20,10 +20,10 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	"github.com/tektoncd/plumbing/catlin/pkg/app"
-	"github.com/tektoncd/plumbing/catlin/pkg/linter"
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
-	"github.com/tektoncd/plumbing/catlin/pkg/validator"
+	"github.com/tektoncd/catlin/pkg/app"
+	"github.com/tektoncd/catlin/pkg/linter"
+	"github.com/tektoncd/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/validator"
 )
 
 func fileExists(path string) bool {

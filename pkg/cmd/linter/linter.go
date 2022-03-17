@@ -16,7 +16,7 @@ package linter
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/tektoncd/plumbing/catlin/pkg/app"
+	"github.com/tektoncd/catlin/pkg/app"
 )
 
 func Command(p app.CLI) *cobra.Command {

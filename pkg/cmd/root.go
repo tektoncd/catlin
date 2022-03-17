@@ -16,10 +16,10 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/tektoncd/plumbing/catlin/pkg/app"
-	"github.com/tektoncd/plumbing/catlin/pkg/cmd/bump"
-	"github.com/tektoncd/plumbing/catlin/pkg/cmd/linter"
-	"github.com/tektoncd/plumbing/catlin/pkg/cmd/validate"
+	"github.com/tektoncd/catlin/pkg/app"
+	"github.com/tektoncd/catlin/pkg/cmd/bump"
+	"github.com/tektoncd/catlin/pkg/cmd/linter"
+	"github.com/tektoncd/catlin/pkg/cmd/validate"
 )
 
 func Root(cli app.CLI) *cobra.Command {

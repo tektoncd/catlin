@@ -6,8 +6,8 @@ import (
 
 	dircp "github.com/otiai10/copy"
 	"github.com/spf13/cobra"
-	"github.com/tektoncd/plumbing/catlin/pkg/app"
-	"github.com/tektoncd/plumbing/catlin/pkg/entry"
+	"github.com/tektoncd/catlin/pkg/app"
+	"github.com/tektoncd/catlin/pkg/entry"
 )
 
 func Command(p app.CLI) *cobra.Command {

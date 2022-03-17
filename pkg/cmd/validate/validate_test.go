@@ -16,8 +16,8 @@ package validate
 import (
 	"testing"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/app"
-	"github.com/tektoncd/plumbing/catlin/pkg/test"
+	"github.com/tektoncd/catlin/pkg/app"
+	"github.com/tektoncd/catlin/pkg/test"
 	"gotest.tools/v3/assert"
 )
 

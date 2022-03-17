@@ -15,7 +15,7 @@
 package linter
 
 import (
-	"github.com/tektoncd/plumbing/catlin/pkg/validator"
+	"github.com/tektoncd/catlin/pkg/validator"
 )
 
 type Linter interface {
