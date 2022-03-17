@@ -22,9 +22,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/app"
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
-	"github.com/tektoncd/plumbing/catlin/pkg/validator"
+	"github.com/tektoncd/catlin/pkg/app"
+	"github.com/tektoncd/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/validator"
 )
 
 var cat = []string{}

@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/parser"
 	"gotest.tools/assert"
 	is "gotest.tools/assert/cmp"
 )

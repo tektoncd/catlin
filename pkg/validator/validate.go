@@ -15,7 +15,7 @@
 package validator
 
 import (
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/parser"
 )
 
 type Validator interface {

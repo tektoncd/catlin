@@ -22,8 +22,8 @@ import (
 	"strings"
 
 	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
-	"github.com/tektoncd/plumbing/catlin/pkg/validator"
+	"github.com/tektoncd/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/validator"
 )
 
 type taskLinter struct {

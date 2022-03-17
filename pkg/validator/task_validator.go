@@ -22,7 +22,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/parser"
 )
 
 const (

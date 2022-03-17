@@ -30,7 +30,7 @@ import (
 	"knative.dev/pkg/apis"
 
 	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
-	"github.com/tektoncd/plumbing/catlin/pkg/consts"
+	"github.com/tektoncd/catlin/pkg/consts"
 )
 
 func registerSchema() {

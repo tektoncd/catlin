@@ -17,7 +17,7 @@ package test
 import (
 	"go.uber.org/zap"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/app"
+	"github.com/tektoncd/catlin/pkg/app"
 )
 
 type testConfig struct {

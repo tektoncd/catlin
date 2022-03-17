@@ -18,7 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/parser"
 )
 
 type PathValidator struct {

@@ -21,8 +21,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/consts"
-	"github.com/tektoncd/plumbing/catlin/pkg/parser"
+	"github.com/tektoncd/catlin/pkg/consts"
+	"github.com/tektoncd/catlin/pkg/parser"
 )
 
 type ContentValidator struct {

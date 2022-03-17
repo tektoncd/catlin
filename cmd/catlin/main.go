@@ -17,8 +17,8 @@ package main
 import (
 	"os"
 
-	"github.com/tektoncd/plumbing/catlin/pkg/app"
-	"github.com/tektoncd/plumbing/catlin/pkg/cmd"
+	"github.com/tektoncd/catlin/pkg/app"
+	"github.com/tektoncd/catlin/pkg/cmd"
 )
 
 func main() {
