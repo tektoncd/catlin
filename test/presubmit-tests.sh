@@ -41,6 +41,19 @@ function check_go_lint() {
     results_banner "Go Lint" 0
 }
 
+function check_go_test() {
+    header "Testing if go unit test has been done"
+
+    make test-unit
+
+    if [[ $? != 0 ]]; then
+        results_banner "Go Unit Test" 1
+        exit 1
+    fi
+
+    results_banner "Go Unit Test" 0
+}
+
 function check_yaml_lint() {
     header "Testing if yamllint has been done"
 
@@ -56,6 +69,7 @@ function check_yaml_lint() {
 
 function post_build_tests() {
     check_go_lint
+    check_go_test
     check_yaml_lint
 }
 
