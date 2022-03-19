@@ -34,7 +34,10 @@ func bumpVersion(cmd *cobra.Command, args []string) error {
 	oldVersionPath := filepath.Join(entryPath, latestVersion.String())
 	newVersionPath := filepath.Join(entryPath, latestVersion.BumpMinor().String())
 	fmt.Printf("Copying %s to %s\n", oldVersionPath, newVersionPath)
-	dircp.Copy(oldVersionPath, newVersionPath)
+	err = dircp.Copy(oldVersionPath, newVersionPath)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

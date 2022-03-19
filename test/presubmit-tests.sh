@@ -31,7 +31,7 @@ function check_go_lint() {
     header "Testing if golint has been done"
 
     # deadline of 5m, and show all the issues
-    golangci-lint -j 1 --color=never run
+    golangci-lint -j 1 --color=never run --timeout=5m
 
     if [[ $? != 0 ]]; then
         results_banner "Go Lint" 1
