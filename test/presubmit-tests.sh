@@ -57,7 +57,7 @@ function check_go_test() {
 function check_yaml_lint() {
     header "Testing if yamllint has been done"
 
-    make lint-yaml
+    yamllint -c .yamllint ./pkg
 
     if [[ $? != 0 ]]; then
         results_banner "YAML Lint" 1
