@@ -21,9 +21,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
 	"github.com/tektoncd/catlin/pkg/parser"
 	"github.com/tektoncd/catlin/pkg/validator"
+	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
 )
 
 type taskLinter struct {
@@ -45,31 +45,31 @@ type config struct {
 func NewConfig() []config {
 	return []config{
 		// Default one is the first one
-		config{regexp: `(/usr/bin/env |.*/bin/)sh`,
+		{regexp: `(/usr/bin/env |.*/bin/)sh`,
 			linters: []linter{
-				linter{
+				{
 					cmd:  "shellcheck",
 					args: []string{"-s", "sh"},
 				},
-				linter{
+				{
 					cmd:  "sh",
 					args: []string{"-n"},
 				},
 			}},
-		config{regexp: `(/usr/bin/env |.*/bin/)bash`,
+		{regexp: `(/usr/bin/env |.*/bin/)bash`,
 			linters: []linter{
-				linter{
+				{
 					cmd:  "shellcheck",
 					args: []string{"-s", "bash"},
 				},
-				linter{
+				{
 					cmd:  "bash",
 					args: []string{"-n"},
 				},
 			}},
-		config{regexp: `(/usr/bin/env\s|.*/bin/|/usr/libexec/platform-)python(23)?`,
+		{regexp: `(/usr/bin/env\s|.*/bin/|/usr/libexec/platform-)python(23)?`,
 			linters: []linter{
-				linter{
+				{
 					cmd:  "pylint",
 					args: []string{"-dC0103"}, // Disabling C0103 which is invalid name convention
 				},
