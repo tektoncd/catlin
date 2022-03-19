@@ -29,8 +29,8 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"knative.dev/pkg/apis"
 
-	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
 	"github.com/tektoncd/catlin/pkg/consts"
+	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
 )
 
 func registerSchema() {
