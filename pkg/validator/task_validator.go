@@ -93,7 +93,7 @@ func (t *taskValidator) validateStep(s v1beta1.Step) Result {
 		return result
 	}
 
-	if strings.Contains(ref.Identifier(), "latest") {
+	if strings.EqualFold(ref.Identifier(), "latest") {
 		result.Error("Step %q uses image %q which must be tagged with a specific version", step, img)
 	}
 

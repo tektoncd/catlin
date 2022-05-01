@@ -64,6 +64,8 @@ spec:
     image: abc.io/xyz/fedora:latest-0.2@sha256:deadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33f
   - name: s10
     image: abc.io/xyz/fedora:latest0.2@sha256:deadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33f
+  - name: s11
+    image: quay.io/foo/bar:stable-2.12-latest
 `
 
 const taskWithInvalidImageRef = `
