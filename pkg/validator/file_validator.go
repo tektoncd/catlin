@@ -21,15 +21,21 @@ import (
 	"github.com/tektoncd/catlin/pkg/parser"
 )
 
+const (
+	GitBasedVersioning       = "git"
+	DirectoryBasedVersioning = "directory"
+)
+
 type PathValidator struct {
-	path string
-	res  *parser.Resource
+	path       string
+	versioning string
+	res        *parser.Resource
 }
 
 var _ Validator = (*PathValidator)(nil)
 
-func NewPathValidator(r *parser.Resource, path string) *PathValidator {
-	return &PathValidator{path: path, res: r}
+func NewPathValidator(r *parser.Resource, path, versioning string) *PathValidator {
+	return &PathValidator{path: path, versioning: versioning, res: r}
 }
 
 func (v *PathValidator) Validate() Result {
@@ -46,7 +52,16 @@ func (v *PathValidator) Validate() Result {
 		return result
 	}
 
-	expectedPath := filepath.Join(kind, name, version, name+".yaml")
+	var expectedPath string
+	switch v.versioning {
+	case GitBasedVersioning:
+		expectedPath = filepath.Join(kind, name, name+".yaml")
+	case DirectoryBasedVersioning:
+		expectedPath = filepath.Join(kind, name, version, name+".yaml")
+	default:
+		result.Error("invalid versioning, expecting git or directory, but got: %s", v.versioning)
+		return result
+	}
 
 	if !strings.HasSuffix(absPath, expectedPath) {
 		result.Error("Resource path is invalid; expected path: %s", expectedPath)

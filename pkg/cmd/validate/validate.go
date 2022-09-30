@@ -81,18 +81,34 @@ func validResourcePath() cobra.PositionalArgs {
 	}
 }
 
+func validateFlags(cmd *cobra.Command, args []string, versioning string) error {
+	if versioning != validator.DirectoryBasedVersioning && versioning != validator.GitBasedVersioning {
+		return fmt.Errorf("invalid versioning: %s, expecting git or directory", versioning)
+	}
+
+	return nil
+}
+
 func Command(cli app.CLI) *cobra.Command {
-	return &cobra.Command{
+	var versioning string
+	cmd := &cobra.Command{
 		Use:     "validate",
 		Aliases: []string{"verify"},
 		Args:    validResourcePath(),
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			return validateFlags(cmd, args, versioning)
+		},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return validateResources(cli, args)
+			return validateResources(cli, args, versioning)
 		},
 	}
+
+	cmd.PersistentFlags().StringVar(&versioning, "versioning", "directory", "Versioning type of catalog (directory/git)")
+
+	return cmd
 }
 
-func validateResources(cli app.CLI, args []string) error {
+func validateResources(cli app.CLI, args []string, versioning string) error {
 
 	out := cli.Stream().Out
 	for _, filePath := range args {
@@ -113,7 +129,7 @@ func validateResources(cli app.CLI, args []string) error {
 						fileWithPath = fileWithPath + "/" + file.Name()
 					}
 					fmt.Fprintf(out, "FILE: %s\n", fileWithPath)
-					err = validate(cli, fileWithPath)
+					err = validate(cli, fileWithPath, versioning)
 					if err != nil {
 						return err
 					}
@@ -121,7 +137,7 @@ func validateResources(cli app.CLI, args []string) error {
 			}
 		} else if filepath.Ext(filePath) == ".yaml" {
 			fmt.Fprintf(out, "FILE: %s\n", filePath)
-			err := validate(cli, filePath)
+			err := validate(cli, filePath, versioning)
 			if err != nil {
 				return err
 			}
@@ -130,7 +146,7 @@ func validateResources(cli app.CLI, args []string) error {
 	return nil
 }
 
-func validate(cli app.CLI, path string) error {
+func validate(cli app.CLI, path, versioning string) error {
 
 	r, err := os.Open(path)
 	if err != nil {
@@ -154,7 +170,7 @@ func validate(cli app.CLI, path string) error {
 
 	// run validators
 	validators := []validator.Validator{
-		validator.NewPathValidator(res, path),
+		validator.NewPathValidator(res, path, versioning),
 		validator.NewContentValidator(res, cat),
 		validator.ForKind(res),
 	}
