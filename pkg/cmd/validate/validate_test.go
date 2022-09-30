@@ -36,8 +36,26 @@ func TestValidate(t *testing.T) {
 			want:      "",
 		},
 		{
+			name:      "single filepath - with directory versioning flag",
+			args:      []string{"./testdata/task/maven/0.1", "--versioning", "directory"},
+			wantError: false,
+			want:      "",
+		},
+		{
+			name:      "single filepath git versioning",
+			args:      []string{"./testdata/task/maven-git-versioning", "--versioning", "git"},
+			wantError: false,
+			want:      "",
+		},
+		{
 			name:      "multiple filepath",
 			args:      []string{"./testdata/task/maven/0.1", "./testdata/task/npm/0.1"},
+			wantError: false,
+			want:      "",
+		},
+		{
+			name:      "multiple filepath git versioning",
+			args:      []string{"./testdata/task/maven-git-versioning", "./testdata/task/npm-git-versioning", "--versioning", "git"},
 			wantError: false,
 			want:      "",
 		},
@@ -71,6 +89,18 @@ func TestValidateError(t *testing.T) {
 			args:      []string{"./testdata/task/black/0.1"},
 			wantError: true,
 			want:      "Error: ./testdata/task/black/0.1/black.yaml failed validation\n",
+		},
+		{
+			name:      "versioning mismatch - git versioning",
+			args:      []string{"./testdata/task/maven/0.1", "--versioning", "git"},
+			wantError: true,
+			want:      "Error: ./testdata/task/maven/0.1/maven.yaml failed validation\n",
+		},
+		{
+			name:      "versioning mismatch - directory versioning",
+			args:      []string{"./testdata/task/maven-git-versioning", "--versioning", "directory"},
+			wantError: true,
+			want:      "Error: ./testdata/task/maven-git-versioning/maven-git-versioning.yaml failed validation\n",
 		},
 	}
 
