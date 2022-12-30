@@ -82,13 +82,12 @@ func GetCategories() ([]string, error) {
 		return nil, fmt.Errorf("failed to read configuration file: %v", err)
 	}
 	if err := viper.Unmarshal(&data); err != nil {
-
 		return nil, fmt.Errorf("failed to unmarshal config data: %v", err)
 	}
 
 	categoriesList := []string{}
 	for i := range data.Categories {
-		categoriesList = append(categoriesList, data.Categories[i].Name)
+		categoriesList = append(categoriesList, data.Categories[i])
 	}
 
 	return categoriesList, nil

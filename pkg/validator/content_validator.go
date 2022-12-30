@@ -37,11 +37,7 @@ func NewContentValidator(r *parser.Resource, c []string) *ContentValidator {
 }
 
 type Data struct {
-	Categories []Category
-}
-
-type Category struct {
-	Name string
+	Categories []string
 }
 
 func (v *ContentValidator) Validate() Result {
