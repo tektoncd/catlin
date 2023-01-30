@@ -20,6 +20,11 @@ This command validates
 catlin validate <path-to-resource-file>
 ```
 
+To validate catalog resources following git-based versioning:
+```
+catlin validate <path-to-resource-file> --versioning git
+```
+
 ### Bump
 
 This command bumps the version of an existing resource in the catalog.
