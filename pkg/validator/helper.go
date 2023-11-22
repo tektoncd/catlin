@@ -86,9 +86,7 @@ func GetCategories() ([]string, error) {
 	}
 
 	categoriesList := []string{}
-	for i := range data.Categories {
-		categoriesList = append(categoriesList, data.Categories[i])
-	}
+	categoriesList = append(categoriesList, data.Categories...)
 
 	return categoriesList, nil
 }
