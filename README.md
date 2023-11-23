@@ -11,11 +11,13 @@ It validates the resources on the basis the Tekton catalog structure defined in 
 ### Validate
 
 This command validates
+
 - If the resource is in valid path
 - If the resource is a valid Tekton Resource
 - If all mandatory fields are added to the resource file
 - If all images used in Task Spec are tagged
 - If platforms are specified in correct format
+
 ```
 catlin validate <path-to-resource-file>
 ```
@@ -38,4 +40,24 @@ $ catlin bump task/git-clone
 Copying task/git-clone/0.5 to task/git-clone/0.6
 ```
 
-[tep]:https://github.com/tektoncd/community/blob/main/teps/0003-tekton-catalog-organization.md
+[tep]: https://github.com/tektoncd/community/blob/main/teps/0003-tekton-catalog-organization.md
+
+## As a pre-commit hook
+
+Catlin may be run as a [pre-commit](https://pre-commit.com/) hook.
+
+As an example `.pre-commit-config.yaml`:
+
+```
+repos:
+  - repo: https://github.com/tektoncd/catlin
+    rev: main
+    hooks:
+      - id: catlin
+        args:
+          - validate
+        files: <REGEX of resource files>
+```
+
+Installing the above pre-commit configuration with `pre-commit install` will automatically run
+the `validate` command on each commit to your resource repository.
