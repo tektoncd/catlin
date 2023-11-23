@@ -1,0 +1,10 @@
+---
+# For use with pre-commit.
+# See usage instructions at https://pre-commit.com
+
+- id: catlin
+  name: catlin
+  description: This hook runs catlin.
+  entry: catlin
+  language: golang
+  types: [file, yaml]
