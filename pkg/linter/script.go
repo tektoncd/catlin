@@ -109,8 +109,8 @@ func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []c
 		for _, linter := range config.linters {
 			execpath, err := exec.LookPath(linter.cmd)
 			if err != nil {
-				result.Warn("Couldn't find the linter %s in the path", linter.cmd)
-				continue
+				result.Error("Couldn't find the linter %s in the path", linter.cmd)
+				return result
 			}
 			tmpfile, err := ioutil.TempFile("", "catlin-script-linter")
 			if err != nil {
