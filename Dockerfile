@@ -1,4 +1,4 @@
-FROM docker.io/library/golang:1.20-alpine3.18 as build
+FROM docker.io/library/golang:1.21-alpine3.18 as build
 
 COPY . /build
 WORKDIR /build
