@@ -85,7 +85,8 @@ spec:
       name: task-1`
 
 var configSh = []config{
-	{regexp: `(/usr/bin/env |/bin/)sh`,
+	{
+		regexp: `(/usr/bin/env |/bin/)sh`,
 		linters: []linter{
 			{
 				cmd:  "sh", // Should always be everywhere

@@ -19,7 +19,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"sync"
 
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -78,11 +77,10 @@ func ForReader(r io.Reader) *TektonParser {
 }
 
 func (t *TektonParser) Parse() (*Resource, error) {
-
 	// both UniversalDeserializer and NewYAMLToJSONDecoder need to
 	var dup bytes.Buffer
 	r := io.TeeReader(t.reader, &dup)
-	contents, err := ioutil.ReadAll(r)
+	contents, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
