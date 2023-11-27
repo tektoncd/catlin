@@ -11,7 +11,7 @@ require (
 	github.com/tektoncd/plumbing v0.0.0-20220817140952-3da8ce01aeeb
 	go.uber.org/zap v1.26.0
 	gotest.tools v2.2.0+incompatible
-	gotest.tools/v3 v3.0.3
+	gotest.tools/v3 v3.5.1
 	k8s.io/apimachinery v0.27.3
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
 	knative.dev/pkg v0.0.0-20231011193800-bd99f2f98be7
