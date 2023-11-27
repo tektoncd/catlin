@@ -40,8 +40,8 @@ func NewTaskValidator(r *parser.Resource) *taskValidator {
 	return &taskValidator{res: r}
 }
 
+// nolint: staticcheck
 func (t *taskValidator) Validate() Result {
-
 	result := Result{}
 
 	res, err := t.res.ToType()
@@ -53,13 +53,11 @@ func (t *taskValidator) Validate() Result {
 	task := res.(*v1beta1.Task)
 	for _, step := range task.Spec.Steps {
 		result.Append(t.validateStep(step))
-
 	}
 	return result
 }
 
 func (t *taskValidator) validateStep(s v1beta1.Step) Result {
-
 	result := Result{}
 	step := s.Name
 	img := s.Image
@@ -119,7 +117,6 @@ func (t *taskValidator) validateStep(s v1beta1.Step) Result {
 				"Step %q references %q directly from its script block. For reliability and security, consider putting the param into an environment variable of the Step and accessing that environment variable in your script instead.",
 				step,
 				expr)
-
 		}
 	}
 
