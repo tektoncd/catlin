@@ -15,7 +15,6 @@
 package linter
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"regexp"
@@ -45,7 +44,8 @@ type config struct {
 func NewConfig() []config {
 	return []config{
 		// Default one is the first one
-		{regexp: `(/usr/bin/env |.*/bin/)sh`,
+		{
+			regexp: `(/usr/bin/env |.*/bin/)sh`,
 			linters: []linter{
 				{
 					cmd:  "shellcheck",
@@ -55,8 +55,10 @@ func NewConfig() []config {
 					cmd:  "sh",
 					args: []string{"-n"},
 				},
-			}},
-		{regexp: `(/usr/bin/env |.*/bin/)bash`,
+			},
+		},
+		{
+			regexp: `(/usr/bin/env |.*/bin/)bash`,
 			linters: []linter{
 				{
 					cmd:  "shellcheck",
@@ -66,14 +68,17 @@ func NewConfig() []config {
 					cmd:  "bash",
 					args: []string{"-n"},
 				},
-			}},
-		{regexp: `(/usr/bin/env\s|.*/bin/|/usr/libexec/platform-)python(23)?`,
+			},
+		},
+		{
+			regexp: `(/usr/bin/env\s|.*/bin/|/usr/libexec/platform-)python(23)?`,
 			linters: []linter{
 				{
 					cmd:  "pylint",
 					args: []string{"-dC0103"}, // Disabling C0103 which is invalid name convention
 				},
-			}},
+			},
+		},
 	}
 }
 
@@ -96,7 +101,6 @@ func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []c
 
 	for _, config := range configs {
 		matched, err := regexp.MatchString(`^#!`+config.regexp+`\n`, s.Script)
-
 		if err != nil {
 			result.Error("Invalid regexp: %s", config.regexp)
 			return result
@@ -112,7 +116,7 @@ func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []c
 				result.Warn("Couldn't find the linter %s in the path", linter.cmd)
 				continue
 			}
-			tmpfile, err := ioutil.TempFile("", "catlin-script-linter")
+			tmpfile, err := os.CreateTemp("", "catlin-script-linter")
 			if err != nil {
 				result.Error("Cannot create temporary files")
 				return result

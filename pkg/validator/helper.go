@@ -17,7 +17,7 @@ package validator
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -69,7 +69,7 @@ func GetCategories() ([]string, error) {
 		return nil, fmt.Errorf(resp.Status)
 	}
 
-	categoryData, err := ioutil.ReadAll(resp.Body)
+	categoryData, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
