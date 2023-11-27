@@ -150,6 +150,7 @@ type tektonResource interface {
 	apis.Defaultable
 }
 
+// nolint: staticcheck
 func typeForKind(kind string) (tektonResource, error) {
 	switch kind {
 	case "Task":
