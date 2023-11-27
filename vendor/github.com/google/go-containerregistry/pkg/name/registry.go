@@ -17,6 +17,7 @@ package name
 import (
 	"net"
 	"net/url"
+	"path"
 	"regexp"
 	"strings"
 )
@@ -48,6 +49,11 @@ func (r Registry) Name() string {
 
 func (r Registry) String() string {
 	return r.Name()
+}
+
+// Repo returns a Repository in the Registry with the given name.
+func (r Registry) Repo(repo ...string) Repository {
+	return Repository{Registry: r, repository: path.Join(repo...)}
 }
 
 // Scope returns the scope required to access the registry.
@@ -98,7 +104,7 @@ func checkRegistry(name string) error {
 	// Per RFC 3986, registries (authorities) are required to be prefixed with "//"
 	// url.Host == hostname[:port] == authority
 	if url, err := url.Parse("//" + name); err != nil || url.Host != name {
-		return NewErrBadName("registries must be valid RFC 3986 URI authorities: %s", name)
+		return newErrBadName("registries must be valid RFC 3986 URI authorities: %s", name)
 	}
 	return nil
 }
@@ -108,7 +114,7 @@ func checkRegistry(name string) error {
 func NewRegistry(name string, opts ...Option) (Registry, error) {
 	opt := makeOptions(opts...)
 	if opt.strict && len(name) == 0 {
-		return Registry{}, NewErrBadName("strict validation requires the registry to be explicitly defined")
+		return Registry{}, newErrBadName("strict validation requires the registry to be explicitly defined")
 	}
 
 	if err := checkRegistry(name); err != nil {

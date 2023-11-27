@@ -16,8 +16,13 @@ limitations under the License.
 
 package duck
 
+import (
+	"knative.dev/pkg/apis/duck/ducktypes"
+)
+
 const (
-	GroupName = "duck.knative.dev"
+	// GroupName is the name of the API group.
+	GroupName = ducktypes.GroupName
 
 	// AddressableDuckVersionLabel is the label we use to declare
 	// that a type conforms to the Addressable duck type.

@@ -201,7 +201,6 @@ spec:
 `
 
 func TestTaskValidator_ValidImageRef(t *testing.T) {
-
 	r := strings.NewReader(taskWithValidImageRef)
 	parser := parser.ForReader(r)
 
@@ -214,11 +213,9 @@ func TestTaskValidator_ValidImageRef(t *testing.T) {
 
 	lints := result.Lints
 	assert.Equal(t, 0, len(lints))
-
 }
 
 func TestTaskValidator_InvalidImageRef(t *testing.T) {
-
 	r := strings.NewReader(taskWithInvalidImageRef)
 	parser := parser.ForReader(r)
 
@@ -270,7 +267,7 @@ func TestTaskValidator_InvalidImageRef(t *testing.T) {
 
 	// image with invalid digest
 	assert.Equal(t, Error, lints[10].Kind)
-	assert.Equal(t, `Step "s9" uses image "gcr.io/k8s-staging-boskos/boskosctl@sha256:a7fc984732" with an invalid digest. Error: digest must be between 71 and 71 runes in length: sha256:a7fc984732`, result.Lints[10].Message)
+	assert.Equal(t, `Step "s9" uses image "gcr.io/k8s-staging-boskos/boskosctl@sha256:a7fc984732" with an invalid digest. Error: invalid checksum digest length`, result.Lints[10].Message)
 
 	// image with invalid registry
 	assert.Equal(t, Warning, lints[11].Kind)
@@ -290,7 +287,6 @@ func TestTaskValidator_InvalidImageRef(t *testing.T) {
 }
 
 func TestTaskValidator_ValidEnvFromSecret(t *testing.T) {
-
 	r := strings.NewReader(taskWithEnvFromSecret)
 	parser := parser.ForReader(r)
 
