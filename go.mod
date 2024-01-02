@@ -7,20 +7,20 @@ require (
 	github.com/otiai10/copy v1.7.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
-	github.com/tektoncd/pipeline v0.53.2
+	github.com/tektoncd/pipeline v0.55.0
 	github.com/tektoncd/plumbing v0.0.0-20220817140952-3da8ce01aeeb
 	go.uber.org/zap v1.26.0
 	gotest.tools v2.2.0+incompatible
 	gotest.tools/v3 v3.5.1
-	k8s.io/apimachinery v0.27.3
+	k8s.io/apimachinery v0.28.3
 	k8s.io/client-go v11.0.1-0.20190805182717-6502b5e7b1b5+incompatible
-	knative.dev/pkg v0.0.0-20231011193800-bd99f2f98be7
+	knative.dev/pkg v0.0.0-20231023150739-56bfe0dd9626
 )
 
 require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200907061046-05415f1de66d // indirect
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0 // indirect
-	github.com/antlr/antlr4/runtime/Go/antlr v1.4.10 // indirect
+	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230305170008-8188dc5388df // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
@@ -38,7 +38,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/cel-go v0.12.6 // indirect
+	github.com/google/cel-go v0.18.1 // indirect
 	github.com/google/gnostic v0.6.9 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
@@ -84,7 +84,7 @@ require (
 	golang.org/x/time v0.5.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/api v0.153.0 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231120223509-83a465c0220f // indirect
@@ -100,7 +100,7 @@ require (
 	k8s.io/utils v0.0.0-20230505201702-9f6742963106 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
-	sigs.k8s.io/yaml v1.3.0 // indirect
+	sigs.k8s.io/yaml v1.4.0 // indirect
 )
 
 // Pin k8s deps to 1.27.7
