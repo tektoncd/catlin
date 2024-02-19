@@ -249,7 +249,7 @@ github.com/stoewer/go-strcase
 # github.com/subosito/gotenv v1.6.0
 ## explicit; go 1.18
 github.com/subosito/gotenv
-# github.com/tektoncd/pipeline v0.56.0
+# github.com/tektoncd/pipeline v0.56.1
 ## explicit; go 1.19
 github.com/tektoncd/pipeline/pkg/apis/config
 github.com/tektoncd/pipeline/pkg/apis/pipeline
