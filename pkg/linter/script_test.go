@@ -40,8 +40,43 @@ spec:
       echo "hello moto"
 `
 
+const taskScriptValidatorGoodV1 = `
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: hello-moto
+spec:
+  steps:
+  - name: s1
+    image: image1
+    script: |
+      #!/usr/bin/env sh
+      echo "Hello world"
+    script: |
+      #!/bin/sh
+      echo "hello moto"
+`
+
 const taskScriptValidatorNoGood = `
 apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello-moto
+spec:
+  steps:
+  - name: nogood
+    image: image1
+    script: |
+      #!/usr/bin/env sh
+      '
+  - name: warn
+    image: image1
+    script: |
+      #!/bin/sh
+      echo "hello world"
+`
+const taskScriptValidatorNoGoodV1 = `
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: hello-moto
@@ -84,6 +119,17 @@ spec:
     taskRef:
       name: task-1`
 
+const pipelineWithTaskRefV1 = `
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pipelien-1
+spec:
+  tasks:
+  - name: pipeline-1
+    taskRef:
+      name: task-1`
+
 var configSh = []config{
 	{
 		regexp: `(/usr/bin/env |/bin/)sh`,
@@ -98,6 +144,20 @@ var configSh = []config{
 
 func TestTaskLint_Script_good(t *testing.T) {
 	r := strings.NewReader(taskScriptValidatorGood)
+	parser := parser.ForReader(r)
+
+	res, err := parser.Parse()
+	assert.NilError(t, err)
+
+	tl := &taskLinter{
+		res:     res,
+		configs: configSh,
+	}
+	result := tl.Validate()
+	assert.Equal(t, 0, result.Errors)
+}
+func TestTaskLint_Script_goodV1(t *testing.T) {
+	r := strings.NewReader(taskScriptValidatorGoodV1)
 	parser := parser.ForReader(r)
 
 	res, err := parser.Parse()
@@ -125,9 +185,37 @@ func TestTaskLint_Script_no_good(t *testing.T) {
 	result := tl.Validate()
 	assert.Equal(t, 1, result.Errors)
 }
+func TestTaskLint_Script_no_goodV1(t *testing.T) {
+	r := strings.NewReader(taskScriptValidatorNoGoodV1)
+	parser := parser.ForReader(r)
+
+	res, err := parser.Parse()
+	assert.NilError(t, err)
+
+	tl := &taskLinter{
+		res:     res,
+		configs: configSh,
+	}
+	result := tl.Validate()
+	assert.Equal(t, 1, result.Errors)
+}
 
 func Test_Pipeline_skip(t *testing.T) {
 	r := strings.NewReader(pipelineWithTaskRef)
+	parser := parser.ForReader(r)
+
+	res, err := parser.Parse()
+	assert.NilError(t, err)
+
+	tl := &taskLinter{
+		res:     res,
+		configs: configSh,
+	}
+	result := tl.Validate()
+	assert.Assert(t, is.Nil(result.Lints))
+}
+func Test_Pipeline_skipV1(t *testing.T) {
+	r := strings.NewReader(pipelineWithTaskRefV1)
 	parser := parser.ForReader(r)
 
 	res, err := parser.Parse()

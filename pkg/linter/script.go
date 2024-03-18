@@ -22,6 +22,7 @@ import (
 
 	"github.com/tektoncd/catlin/pkg/parser"
 	"github.com/tektoncd/catlin/pkg/validator"
+	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1"
 	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
 )
 
@@ -88,20 +89,20 @@ func NewScriptLinter(r *parser.Resource) *taskLinter {
 }
 
 // nolint: staticcheck
-func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []config) validator.Result {
+func (t *taskLinter) validateScript(taskName string, script string, configs []config, stepName string) validator.Result {
 	result := validator.Result{}
 
 	// use /bin/sh by default if no shbang
-	if s.Script[0:2] != "#!" {
-		s.Script = "#!/usr/bin/env sh\n" + s.Script
+	if script[0:2] != "#!" {
+		script = "#!/usr/bin/env sh\n" + script
 	} else { // using a shbang, check if we have /usr/bin/env
-		if s.Script[0:14] != "#!/usr/bin/env" {
+		if script[0:14] != "#!/usr/bin/env" {
 			result.Warn("step: %s is not using #!/usr/bin/env ", taskName)
 		}
 	}
 
 	for _, config := range configs {
-		matched, err := regexp.MatchString(`^#!`+config.regexp+`\n`, s.Script)
+		matched, err := regexp.MatchString(`^#!`+config.regexp+`\n`, script)
 		if err != nil {
 			result.Error("Invalid regexp: %s", config.regexp)
 			return result
@@ -123,7 +124,7 @@ func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []c
 				return result
 			}
 			defer os.Remove(tmpfile.Name()) // clean up
-			if _, err := tmpfile.Write([]byte(s.Script)); err != nil {
+			if _, err := tmpfile.Write([]byte(script)); err != nil {
 				result.Error("Cannot write to temporary files")
 				return result
 			}
@@ -138,7 +139,7 @@ func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []c
 			cmd := exec.Command(execpath, append(linter.args, tmpfile.Name())...)
 			out, err := cmd.CombinedOutput()
 			if err != nil {
-				outt := strings.ReplaceAll(string(out), tmpfile.Name(), taskName+"-"+s.Name)
+				outt := strings.ReplaceAll(string(out), tmpfile.Name(), taskName+"-"+stepName)
 				result.Error("%s, %s failed:\n%s", execpath, linter.args, outt)
 			}
 		}
@@ -148,10 +149,18 @@ func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []c
 }
 
 // nolint: staticcheck
-func (t *taskLinter) collectOverSteps(steps []v1beta1.Step, name string, result *validator.Result) {
-	for _, step := range steps {
-		if step.Script != "" {
-			result.Append(t.validateScript(name, step, t.configs))
+func (t *taskLinter) collectOverSteps(steps interface{}, name string, result *validator.Result) {
+	if s, ok := steps.([]v1beta1.Step); ok {
+		for _, step := range s {
+			if step.Script != "" {
+				result.Append(t.validateScript(name, step.Script, t.configs, step.Name))
+			}
+		}
+	} else if s, ok := steps.([]v1.Step); ok {
+		for _, step := range s {
+			if step.Script != "" {
+				result.Append(t.validateScript(name, step.Script, t.configs, step.Name))
+			}
 		}
 	}
 }
@@ -167,8 +176,14 @@ func (t *taskLinter) Validate() validator.Result {
 
 	switch strings.ToLower(t.res.Kind) {
 	case "task":
-		task := res.(*v1beta1.Task)
-		t.collectOverSteps(task.Spec.Steps, task.ObjectMeta.Name, &result)
+		if res.(*v1.Task) != nil {
+			task := res.(*v1.Task)
+			t.collectOverSteps(task.Spec.Steps, task.ObjectMeta.Name, &result)
+		} else {
+			task := res.(*v1beta1.Task)
+			t.collectOverSteps(task.Spec.Steps, task.ObjectMeta.Name, &result)
+		}
+
 	case "clustertask":
 		task := res.(*v1beta1.ClusterTask)
 		t.collectOverSteps(task.Spec.Steps, task.ObjectMeta.Name, &result)
