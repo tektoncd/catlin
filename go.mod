@@ -3,7 +3,7 @@ module github.com/tektoncd/catlin
 go 1.20
 
 require (
-	github.com/google/go-containerregistry v0.19.0
+	github.com/google/go-containerregistry v0.19.1
 	github.com/otiai10/copy v1.14.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
