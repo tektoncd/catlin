@@ -20,7 +20,7 @@ import (
 	"strings"
 
 	"github.com/google/go-containerregistry/pkg/name"
-	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
+	v1 "github.com/tektoncd/pipeline/pkg/apis/pipeline/v1"
 
 	"github.com/tektoncd/catlin/pkg/parser"
 )
@@ -50,14 +50,14 @@ func (t *taskValidator) Validate() Result {
 		return result
 	}
 
-	task := res.(*v1beta1.Task)
+	task := res.(*v1.Task)
 	for _, step := range task.Spec.Steps {
 		result.Append(t.validateStep(step))
 	}
 	return result
 }
 
-func (t *taskValidator) validateStep(s v1beta1.Step) Result {
+func (t *taskValidator) validateStep(s v1.Step) Result {
 	result := Result{}
 	step := s.Name
 	img := s.Image

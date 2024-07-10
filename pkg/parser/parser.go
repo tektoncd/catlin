@@ -29,11 +29,12 @@ import (
 	"knative.dev/pkg/apis"
 
 	"github.com/tektoncd/catlin/pkg/consts"
+	v1 "github.com/tektoncd/pipeline/pkg/apis/pipeline/v1"
 	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
 )
 
 func registerSchema() {
-	beta1 := runtime.NewSchemeBuilder(v1beta1.AddToScheme)
+	beta1 := runtime.NewSchemeBuilder(v1beta1.AddToScheme, v1.AddToScheme)
 	_ = beta1.AddToScheme(scheme.Scheme)
 }
 
@@ -154,7 +155,7 @@ type tektonResource interface {
 func typeForKind(kind string) (tektonResource, error) {
 	switch kind {
 	case "Task":
-		return &v1beta1.Task{}, nil
+		return &v1.Task{}, nil
 	case "ClusterTask":
 		return &v1beta1.ClusterTask{}, nil
 	case "Pipeline":
@@ -166,5 +167,5 @@ func typeForKind(kind string) (tektonResource, error) {
 
 func isTektonKind(gvk *schema.GroupVersionKind) bool {
 	id := gvk.GroupVersion().Identifier()
-	return id == v1beta1.SchemeGroupVersion.Identifier()
+	return id == v1beta1.SchemeGroupVersion.Identifier() || id == v1.SchemeGroupVersion.Identifier()
 }
