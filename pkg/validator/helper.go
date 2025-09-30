@@ -16,6 +16,7 @@ package validator
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -66,7 +67,7 @@ func GetCategories() ([]string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf(resp.Status)
+		return nil, errors.New(resp.Status)
 	}
 
 	categoryData, err := io.ReadAll(resp.Body)
