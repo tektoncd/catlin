@@ -5,7 +5,7 @@ WORKDIR /build
 RUN GOOS=linux GARCH=amd64 CGO_ENABLED=0 \
     go build -o catlin ./cmd/catlin
 
-FROM docker.io/library/alpine:3.19
+FROM docker.io/library/alpine:3.22
 
 RUN apk --no-cache add bash shellcheck py3-pip
 
