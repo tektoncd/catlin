@@ -15,6 +15,7 @@
 package validate
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -117,7 +118,7 @@ func validateResources(cli app.CLI, args []string, versioning string) error {
 
 			files, err := getFilesInDir(filePath)
 			if err != nil {
-				return fmt.Errorf(err.Error())
+				return errors.New(err.Error())
 			}
 
 			for _, file := range files {
