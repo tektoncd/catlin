@@ -169,9 +169,6 @@ func (t *taskLinter) Validate() validator.Result {
 	case "task":
 		task := res.(*v1beta1.Task)
 		t.collectOverSteps(task.Spec.Steps, task.ObjectMeta.Name, &result)
-	case "clustertask":
-		task := res.(*v1beta1.ClusterTask)
-		t.collectOverSteps(task.Spec.Steps, task.ObjectMeta.Name, &result)
 	}
 	return result
 }

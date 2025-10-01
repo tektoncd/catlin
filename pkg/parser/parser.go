@@ -155,8 +155,6 @@ func typeForKind(kind string) (tektonResource, error) {
 	switch kind {
 	case "Task":
 		return &v1beta1.Task{}, nil
-	case "ClusterTask":
-		return &v1beta1.ClusterTask{}, nil
 	case "Pipeline":
 		return &v1beta1.Pipeline{}, nil
 	}
