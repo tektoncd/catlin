@@ -21,6 +21,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"slices"
 
 	"github.com/spf13/viper"
 )
@@ -30,12 +31,7 @@ const url = "https://raw.githubusercontent.com/tektoncd/hub/main/config.yaml"
 // Checks if the added category annotation is
 // from predefined category list
 func contains(slice []string, val string) bool {
-	for _, item := range slice {
-		if item == val {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, val)
 }
 
 // Loads the Env variable
@@ -64,7 +60,12 @@ func GetCategories() ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		err := resp.Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New(resp.Status)

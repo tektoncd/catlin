@@ -122,7 +122,11 @@ func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []c
 				result.Error("Cannot create temporary files")
 				return result
 			}
-			defer os.Remove(tmpfile.Name()) // clean up
+			defer func() { // clean up
+				if err := os.Remove(tmpfile.Name()); err != nil {
+					panic(err)
+				}
+			}()
 			if _, err := tmpfile.Write([]byte(s.Script)); err != nil {
 				result.Error("Cannot write to temporary files")
 				return result

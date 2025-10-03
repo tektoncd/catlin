@@ -87,16 +87,31 @@ func scriptLint(cli app.CLI, paths []string) error {
 		for _, v := range result.Lints {
 			switch v.Kind {
 			case validator.Error:
-				fmt.Fprintf(out, "ERROR: %s\n", v.Message)
+				_, err := fmt.Fprintf(out, "ERROR: %s\n", v.Message)
+				if err != nil {
+					return err
+				}
 			case validator.Warning:
-				fmt.Fprintf(out, "WARN : %s\n", v.Message)
+				_, err := fmt.Fprintf(out, "WARN : %s\n", v.Message)
+				if err != nil {
+					return err
+				}
 			case validator.Recommendation:
-				fmt.Fprintf(out, "HINT : %s\n", v.Message)
+				_, err := fmt.Fprintf(out, "HINT : %s\n", v.Message)
+				if err != nil {
+					return err
+				}
 			case validator.Info:
-				fmt.Fprintf(out, "INFO : %s\n", v.Message)
+				_, err := fmt.Fprintf(out, "INFO : %s\n", v.Message)
+				if err != nil {
+					return err
+				}
 			default:
 				level := strings.ToUpper(fmt.Sprint(v.Kind))
-				fmt.Fprintf(out, "%s : %s\n", level, v.Message)
+				_, err := fmt.Fprintf(out, "%s : %s\n", level, v.Message)
+				if err != nil {
+					return err
+				}
 			}
 		}
 		if result.Errors != 0 {
@@ -105,7 +120,7 @@ func scriptLint(cli app.CLI, paths []string) error {
 	}
 
 	if len(errors) > 0 {
-		return fmt.Errorf("Files \"%s\" has failed validation", strings.Join(errors, ", "))
+		return fmt.Errorf("files \"%s\" has failed validation", strings.Join(errors, ", "))
 	}
 
 	return nil

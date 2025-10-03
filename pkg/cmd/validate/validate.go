@@ -129,7 +129,10 @@ func validateResources(cli app.CLI, args []string, versioning string) error {
 					} else {
 						fileWithPath = fileWithPath + "/" + file.Name()
 					}
-					fmt.Fprintf(out, "FILE: %s\n", fileWithPath)
+					_, err := fmt.Fprintf(out, "FILE: %s\n", fileWithPath)
+					if err != nil {
+						return err
+					}
 					err = validate(cli, fileWithPath, versioning)
 					if err != nil {
 						return err
@@ -137,8 +140,11 @@ func validateResources(cli app.CLI, args []string, versioning string) error {
 				}
 			}
 		} else if filepath.Ext(filePath) == ".yaml" {
-			fmt.Fprintf(out, "FILE: %s\n", filePath)
-			err := validate(cli, filePath, versioning)
+			_, err := fmt.Fprintf(out, "FILE: %s\n", filePath)
+			if err != nil {
+				return err
+			}
+			err = validate(cli, filePath, versioning)
 			if err != nil {
 				return err
 			}
@@ -186,16 +192,31 @@ func validate(cli app.CLI, path, versioning string) error {
 	for _, v := range result.Lints {
 		switch v.Kind {
 		case validator.Error:
-			fmt.Fprintf(out, "ERROR: %s\n", v.Message)
+			_, err := fmt.Fprintf(out, "ERROR: %s\n", v.Message)
+			if err != nil {
+				return err
+			}
 		case validator.Warning:
-			fmt.Fprintf(out, "WARN : %s\n", v.Message)
+			_, err := fmt.Fprintf(out, "WARN : %s\n", v.Message)
+			if err != nil {
+				return err
+			}
 		case validator.Recommendation:
-			fmt.Fprintf(out, "HINT : %s\n", v.Message)
+			_, err := fmt.Fprintf(out, "HINT : %s\n", v.Message)
+			if err != nil {
+				return err
+			}
 		case validator.Info:
-			fmt.Fprintf(out, "INFO : %s\n", v.Message)
+			_, err := fmt.Fprintf(out, "INFO : %s\n", v.Message)
+			if err != nil {
+				return err
+			}
 		default:
 			level := strings.ToUpper(fmt.Sprint(v.Kind))
-			fmt.Fprintf(out, "%s : %s\n", level, v.Message)
+			_, err := fmt.Fprintf(out, "%s : %s\n", level, v.Message)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	if result.Errors != 0 {
