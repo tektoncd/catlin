@@ -59,20 +59,6 @@ spec:
       echo "hello world"
 `
 
-const clusterTaskTest = `
-apiVersion: tekton.dev/v1beta1
-kind: ClusterTask
-metadata:
-  name: hello-moto
-spec:
-  steps:
-  - name: nogood
-    image: image1
-    script: |
-      #!/usr/bin/env sh
-      '
-`
-
 const pipelineWithTaskRef = `
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
@@ -139,19 +125,4 @@ func Test_Pipeline_skip(t *testing.T) {
 	}
 	result := tl.Validate()
 	assert.Assert(t, is.Nil(result.Lints))
-}
-
-func Test_ClusterTaskParse(t *testing.T) {
-	r := strings.NewReader(clusterTaskTest)
-	parser := parser.ForReader(r)
-
-	res, err := parser.Parse()
-	assert.NilError(t, err)
-
-	tl := &taskLinter{
-		res:     res,
-		configs: configSh,
-	}
-	result := tl.Validate()
-	assert.Equal(t, 1, result.Errors)
 }

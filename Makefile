@@ -48,9 +48,7 @@ lint: lint-go ## run all linters
 .PHONY: lint-go
 lint-go: ## runs go linter on all go files
 	@echo "Linting go files..."
-	@golangci-lint run ./...  --max-issues-per-linter=0 \
-							--max-same-issues=0 \
-							--deadline 5m
+	@golangci-lint run --modules-download-mode=vendor --max-issues-per-linter=0 --max-same-issues=0 --timeout 5m
 
 .PHONY: test-unit
 test-unit: ## run unit tests
