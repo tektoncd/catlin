@@ -7,7 +7,7 @@ toolchain go1.24.7
 require (
 	github.com/google/go-containerregistry v0.20.6
 	github.com/otiai10/copy v1.14.0
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.1
 	github.com/spf13/viper v1.19.0
 	github.com/tektoncd/pipeline v1.4.0
 	github.com/tektoncd/plumbing v0.0.0-20220817140952-3da8ce01aeeb
@@ -71,7 +71,7 @@ require (
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
