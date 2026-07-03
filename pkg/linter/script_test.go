@@ -82,6 +82,36 @@ var configSh = []config{
 	},
 }
 
+const v1TaskScriptValidatorGood = `
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: hello-moto-v1
+spec:
+  steps:
+  - name: s1
+    image: image1
+    script: |
+      #!/bin/sh
+      echo "hello moto"
+`
+
+// TestTaskLint_Script_v1 ensures the script linter works on tekton.dev/v1 Tasks.
+func TestTaskLint_Script_v1(t *testing.T) {
+	r := strings.NewReader(v1TaskScriptValidatorGood)
+	parser := parser.ForReader(r)
+
+	res, err := parser.Parse()
+	assert.NilError(t, err)
+
+	tl := &taskLinter{
+		res:     res,
+		configs: configSh,
+	}
+	result := tl.Validate()
+	assert.Equal(t, 0, result.Errors)
+}
+
 func TestTaskLint_Script_good(t *testing.T) {
 	r := strings.NewReader(taskScriptValidatorGood)
 	parser := parser.ForReader(r)

@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: v1-hello
+  labels:
+    app.kubernetes.io/version: '0.1'
+  annotations:
+    tekton.dev/pipelines.minVersion: '0.12.1'
+    tekton.dev/tags: hello
+    tekton.dev/categories: Build Tools
+    tekton.dev/displayName: 'Hello v1'
+    tekton.dev/platforms: 'linux/amd64'
+spec:
+  description: >-
+    A minimal tekton.dev/v1 Task used to verify catlin validates v1 resources.
+  steps:
+    - name: hello
+      image: docker.io/library/ubuntu:1.0
+      command:
+        - /bin/sh
+        - -c
+        - echo hello

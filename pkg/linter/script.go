@@ -22,7 +22,7 @@ import (
 
 	"github.com/tektoncd/catlin/pkg/parser"
 	"github.com/tektoncd/catlin/pkg/validator"
-	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1beta1"
+	"github.com/tektoncd/pipeline/pkg/apis/pipeline/v1"
 )
 
 type taskLinter struct {
@@ -87,8 +87,7 @@ func NewScriptLinter(r *parser.Resource) *taskLinter {
 	return &taskLinter{res: r, configs: NewConfig()}
 }
 
-// nolint: staticcheck
-func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []config) validator.Result {
+func (t *taskLinter) validateScript(taskName string, s v1.Step, configs []config) validator.Result {
 	result := validator.Result{}
 
 	// use /bin/sh by default if no shbang
@@ -151,8 +150,7 @@ func (t *taskLinter) validateScript(taskName string, s v1beta1.Step, configs []c
 	return result
 }
 
-// nolint: staticcheck
-func (t *taskLinter) collectOverSteps(steps []v1beta1.Step, name string, result *validator.Result) {
+func (t *taskLinter) collectOverSteps(steps []v1.Step, name string, result *validator.Result) {
 	for _, step := range steps {
 		if step.Script != "" {
 			result.Append(t.validateScript(name, step, t.configs))
@@ -160,7 +158,6 @@ func (t *taskLinter) collectOverSteps(steps []v1beta1.Step, name string, result 
 	}
 }
 
-// nolint: staticcheck
 func (t *taskLinter) Validate() validator.Result {
 	result := validator.Result{}
 	res, err := t.res.ToType()
@@ -171,7 +168,7 @@ func (t *taskLinter) Validate() validator.Result {
 
 	switch strings.ToLower(t.res.Kind) {
 	case "task":
-		task := res.(*v1beta1.Task)
+		task := res.(*v1.Task)
 		t.collectOverSteps(task.Spec.Steps, task.ObjectMeta.Name, &result)
 	}
 	return result
