@@ -200,6 +200,81 @@ spec:
       print("""$(params.secret)""")
 `
 
+const v1TaskValidImageRef = `
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: v1-valid-image-refs
+  labels:
+    app.kubernetes.io/version: a,b,c
+  annotations:
+    tekton.dev/tags: a,b,c
+    tekton.dev/pipelines.minVersion: "0.12"
+    tekton.dev/displayName: My Example Task
+spec:
+  description: |-
+    A summary of the resource
+
+    A para about this valid task
+  steps:
+  - name: s1
+    image: docker.io/foo:bar
+  - name: s2
+    image: abc.io/fedora:1.0@sha256:deadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33fdeadb33f
+`
+
+const v1TaskInvalidImageRef = `
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: v1-invalid-image-refs
+  labels:
+    app.kubernetes.io/version: a,b,c
+  annotations:
+    tekton.dev/tags: a,b,c
+    tekton.dev/pipelines.minVersion: "0.12"
+    tekton.dev/displayName: My Example Task
+spec:
+  description: |-
+    A summary of the resource
+
+    A para about this valid task
+  steps:
+  - name: s1
+    image: ubuntu
+  - name: s2
+    image: api:latest
+`
+
+// TestTaskValidator_V1_ValidImageRef ensures tekton.dev/v1 Tasks are parsed
+// and validated just like v1beta1 ones.
+func TestTaskValidator_V1_ValidImageRef(t *testing.T) {
+	r := strings.NewReader(v1TaskValidImageRef)
+	parser := parser.ForReader(r)
+
+	res, err := parser.Parse()
+	assert.NilError(t, err)
+
+	v := ForKind(res)
+	result := v.Validate()
+	assert.Equal(t, 0, result.Errors)
+	assert.Equal(t, 0, len(result.Lints))
+}
+
+// TestTaskValidator_V1_InvalidImageRef ensures validation rules fire for v1.
+func TestTaskValidator_V1_InvalidImageRef(t *testing.T) {
+	r := strings.NewReader(v1TaskInvalidImageRef)
+	parser := parser.ForReader(r)
+
+	res, err := parser.Parse()
+	assert.NilError(t, err)
+
+	v := ForKind(res)
+	result := v.Validate()
+	// s1 "ubuntu": must be tagged (1 error); s2 "api:latest": latest (1 error)
+	assert.Equal(t, 2, result.Errors)
+}
+
 func TestTaskValidator_ValidImageRef(t *testing.T) {
 	r := strings.NewReader(taskWithValidImageRef)
 	parser := parser.ForReader(r)

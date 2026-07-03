@@ -36,6 +36,12 @@ func TestValidate(t *testing.T) {
 			want:      "",
 		},
 		{
+			name:      "single filepath - tekton.dev/v1 task",
+			args:      []string{"./testdata/task/v1-hello/0.1"},
+			wantError: false,
+			want:      "",
+		},
+		{
 			name:      "single filepath - with directory versioning flag",
 			args:      []string{"./testdata/task/maven/0.1", "--versioning", "directory"},
 			wantError: false,
