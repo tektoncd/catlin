@@ -7,7 +7,7 @@ toolchain go1.24.7
 require (
 	github.com/google/go-containerregistry v0.20.6
 	github.com/otiai10/copy v1.14.0
-	github.com/spf13/cobra v1.9.1
+	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/tektoncd/pipeline v1.4.0
 	github.com/tektoncd/plumbing v0.0.0-20220817140952-3da8ce01aeeb
