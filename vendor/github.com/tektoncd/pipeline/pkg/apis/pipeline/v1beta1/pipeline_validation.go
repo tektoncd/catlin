@@ -89,12 +89,18 @@ func (ps *PipelineSpec) Validate(ctx context.Context) (errs *apis.FieldError) {
 	errs = errs.Also(validatePipelineWorkspacesDeclarations(ps.Workspaces))
 	// Validate the pipeline's results
 	errs = errs.Also(validatePipelineResults(ps.Results, ps.Tasks, ps.Finally))
+	// Reject result references to PipelineTasks that use pipelineRef or pipelineSpec.
+	// Result propagation from a child Pipeline is not implemented in the initial
+	// Pipelines-in-Pipelines alpha; see docs/pipelines-in-pipelines.md#limitations.
+	errs = errs.Also(validatePipelineRefResultReferencesDisallowed(ps.Tasks, ps.Finally))
 	errs = errs.Also(validateTasksAndFinallySection(ps))
 	errs = errs.Also(validateFinalTasks(ps.Tasks, ps.Finally))
 	errs = errs.Also(validateWhenExpressions(ctx, ps.Tasks, ps.Finally))
 	errs = errs.Also(validateArtifactReference(ctx, ps.Tasks, ps.Finally))
 	errs = errs.Also(validateMatrix(ctx, ps.Tasks).ViaField("tasks"))
 	errs = errs.Also(validateMatrix(ctx, ps.Finally).ViaField("finally"))
+	errs = errs.Also(validateVarSubstitutionExpressions(ps.Tasks, "tasks"))
+	errs = errs.Also(validateVarSubstitutionExpressions(ps.Finally, "finally"))
 	return errs
 }
 
@@ -341,6 +347,19 @@ func (pt PipelineTask) validateRefOrSpec(ctx context.Context) (errs *apis.FieldE
 	return errs
 }
 
+// isValidAPIVersion validates the format of an apiVersion string.
+// Valid formats are "group/version" where both group and version are non-empty.
+// For custom tasks, apiVersion must always be in the "group/version" format.
+func isValidAPIVersion(apiVersion string) bool {
+	parts := strings.Split(apiVersion, "/")
+	if len(parts) != 2 {
+		return false
+	}
+	group := parts[0]
+	version := parts[1]
+	return group != "" && version != ""
+}
+
 // validateCustomTask validates custom task specifications - checking kind and fail if not yet supported features specified
 func (pt PipelineTask) validateCustomTask() (errs *apis.FieldError) {
 	if pt.TaskRef != nil && pt.TaskRef.Kind == "" {
@@ -349,10 +368,19 @@ func (pt PipelineTask) validateCustomTask() (errs *apis.FieldError) {
 	if pt.TaskSpec != nil && pt.TaskSpec.Kind == "" {
 		errs = errs.Also(apis.ErrInvalidValue("custom task spec must specify kind", "taskSpec.kind"))
 	}
-	if pt.TaskRef != nil && pt.TaskRef.APIVersion == "" {
+	// Validate apiVersion format for custom tasks
+	if pt.TaskRef != nil && pt.TaskRef.APIVersion != "" {
+		if !isValidAPIVersion(pt.TaskRef.APIVersion) {
+			errs = errs.Also(apis.ErrInvalidValue(fmt.Sprintf("invalid apiVersion format %q, must be in the format \"group/version\"", pt.TaskRef.APIVersion), "taskRef.apiVersion"))
+		}
+	} else if pt.TaskRef != nil {
 		errs = errs.Also(apis.ErrInvalidValue("custom task ref must specify apiVersion", "taskRef.apiVersion"))
 	}
-	if pt.TaskSpec != nil && pt.TaskSpec.APIVersion == "" {
+	if pt.TaskSpec != nil && pt.TaskSpec.APIVersion != "" {
+		if !isValidAPIVersion(pt.TaskSpec.APIVersion) {
+			errs = errs.Also(apis.ErrInvalidValue(fmt.Sprintf("invalid apiVersion format %q, must be in the format \"group/version\"", pt.TaskSpec.APIVersion), "taskSpec.apiVersion"))
+		}
+	} else if pt.TaskSpec != nil {
 		errs = errs.Also(apis.ErrInvalidValue("custom task spec must specify apiVersion", "taskSpec.apiVersion"))
 	}
 	return errs
@@ -709,6 +737,43 @@ func validateTasksAndFinallySection(ps *PipelineSpec) *apis.FieldError {
 	return nil
 }
 
+// validatePipelineRefResultReferencesDisallowed rejects any result reference
+// (`$(tasks.<name>.results.*)` or `$(finally.<name>.results.*)`) whose target
+// PipelineTask is a Pipeline-in-Pipeline (uses pipelineRef or pipelineSpec).
+//
+// Result propagation from a child Pipeline is not yet implemented: the
+// reconciler's convertToResultRefs path reads from ResolvedPipelineTask.TaskRuns
+// which is empty for a child-pipeline task, so without this guard such a
+// reference would panic the controller at runtime. Once propagation lands,
+// this guard can be removed.
+func validatePipelineRefResultReferencesDisallowed(tasks []PipelineTask, finally []PipelineTask) (errs *apis.FieldError) {
+	pipelineRefTasks := sets.NewString()
+	for _, t := range tasks {
+		if t.PipelineRef != nil || t.PipelineSpec != nil {
+			pipelineRefTasks.Insert(t.Name)
+		}
+	}
+	if pipelineRefTasks.Len() == 0 {
+		return nil
+	}
+
+	check := func(pts []PipelineTask, field string) {
+		for idx, pt := range pts {
+			for _, ref := range PipelineTaskResultRefs(&pt) {
+				if pipelineRefTasks.Has(ref.PipelineTask) {
+					errs = errs.Also(apis.ErrInvalidValue(
+						fmt.Sprintf("result reference to pipelineTask %q is not supported: referenced task uses pipelineRef or pipelineSpec and result propagation from child Pipelines is not yet implemented",
+							ref.PipelineTask),
+						"").ViaFieldIndex(field, idx))
+				}
+			}
+		}
+	}
+	check(tasks, "tasks")
+	check(finally, "finally")
+	return errs
+}
+
 func validateFinalTasks(tasks []PipelineTask, finalTasks []PipelineTask) (errs *apis.FieldError) {
 	for idx, f := range finalTasks {
 		if len(f.RunAfter) != 0 {
@@ -787,6 +852,69 @@ func validateMatrix(ctx context.Context, tasks []PipelineTask) (errs *apis.Field
 	return errs
 }
 
+func validateVarSubstitutionExpressions(tasks []PipelineTask, fieldPath string) (errs *apis.FieldError) {
+	validPrefixes := sets.NewString("params", "tasks", "finally", "context", "workspaces")
+	for idx, task := range tasks {
+		for _, param := range task.Params {
+			if expressions, ok := GetVarSubstitutionExpressionsForParam(param); ok {
+				for _, expression := range expressions {
+					prefix := strings.SplitN(expression, ".", 2)[0]
+					if !validPrefixes.Has(prefix) {
+						errs = errs.Also(apis.ErrInvalidValue(
+							fmt.Sprintf("invalid variable reference %q, must start with a valid prefix: params, tasks, finally, context, or workspaces; if you meant a shell variable, use ${VAR} instead", "$("+expression+")"),
+							"value",
+						).ViaFieldKey("params", param.Name).ViaFieldIndex(fieldPath, idx))
+					}
+				}
+			}
+		}
+		for i, we := range task.WhenExpressions {
+			if expressions, ok := we.GetVarSubstitutionExpressions(); ok {
+				for _, expression := range expressions {
+					prefix := strings.SplitN(expression, ".", 2)[0]
+					if !validPrefixes.Has(prefix) {
+						errs = errs.Also(apis.ErrInvalidValue(
+							fmt.Sprintf("invalid variable reference %q, must start with a valid prefix: params, tasks, finally, context, or workspaces; if you meant a shell variable, use ${VAR} instead", "$("+expression+")"),
+							"",
+						).ViaFieldIndex("when", i).ViaFieldIndex(fieldPath, idx))
+					}
+				}
+			}
+		}
+		if task.IsMatrixed() {
+			for _, param := range task.Matrix.Params {
+				if expressions, ok := GetVarSubstitutionExpressionsForParam(param); ok {
+					for _, expression := range expressions {
+						prefix := strings.SplitN(expression, ".", 2)[0]
+						if !validPrefixes.Has(prefix) {
+							errs = errs.Also(apis.ErrInvalidValue(
+								fmt.Sprintf("invalid variable reference %q, must start with a valid prefix: params, tasks, finally, context, or workspaces; if you meant a shell variable, use ${VAR} instead", "$("+expression+")"),
+								"value",
+							).ViaFieldKey("matrix.params", param.Name).ViaFieldIndex(fieldPath, idx))
+						}
+					}
+				}
+			}
+			for i, include := range task.Matrix.Include {
+				for _, param := range include.Params {
+					if expressions, ok := GetVarSubstitutionExpressionsForParam(param); ok {
+						for _, expression := range expressions {
+							prefix := strings.SplitN(expression, ".", 2)[0]
+							if !validPrefixes.Has(prefix) {
+								errs = errs.Also(apis.ErrInvalidValue(
+									fmt.Sprintf("invalid variable reference %q, must start with a valid prefix: params, tasks, finally, context, or workspaces; if you meant a shell variable, use ${VAR} instead", "$("+expression+")"),
+									"value",
+								).ViaFieldKey("params", param.Name).ViaFieldIndex("matrix.include", i).ViaFieldIndex(fieldPath, idx))
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return errs
+}
+
 // findAndValidateResultRefsForMatrix checks that any result references to Matrixed PipelineTasks if consumed
 // by another PipelineTask that the entire array of results produced by a matrix is consumed in aggregate
 // since consuming a singular result produced by a matrix is currently not supported
@@ -811,6 +939,10 @@ func findAndValidateResultRefsForMatrix(tasks []PipelineTask, taskMapping map[st
 func validateMatrixedPipelineTaskConsumed(expressions []string, taskMapping map[string]PipelineTask) (resultRefs []*ResultRef, errs *apis.FieldError) {
 	var filteredExpressions []string
 	for _, expression := range expressions {
+		// if it is not matrix result ref expression, skip
+		if !resultref.LooksLikeResultRef(expression) {
+			continue
+		}
 		// ie. "tasks.<pipelineTaskName>.results.<resultName>[*]"
 		subExpressions := strings.Split(expression, ".")
 		pipelineTask := subExpressions[1] // pipelineTaskName

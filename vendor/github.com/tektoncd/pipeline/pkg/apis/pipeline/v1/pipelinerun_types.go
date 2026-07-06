@@ -84,6 +84,16 @@ func (pr *PipelineRun) HasStarted() bool {
 	return pr.Status.StartTime != nil && !pr.Status.StartTime.IsZero()
 }
 
+// IsSuccessful returns true if the PipelineRun's status indicates that it has succeeded.
+func (pr *PipelineRun) IsSuccessful() bool {
+	return pr != nil && pr.Status.GetCondition(apis.ConditionSucceeded).IsTrue()
+}
+
+// IsFailure returns true if the PipelineRun's status indicates that it has failed.
+func (pr *PipelineRun) IsFailure() bool {
+	return pr != nil && pr.Status.GetCondition(apis.ConditionSucceeded).IsFalse()
+}
+
 // IsCancelled returns true if the PipelineRun's spec status is set to Cancelled state
 func (pr *PipelineRun) IsCancelled() bool {
 	return pr.Spec.Status == PipelineRunSpecStatusCancelled
@@ -283,6 +293,12 @@ type PipelineRunSpec struct {
 	// +optional
 	// +listType=atomic
 	TaskRunSpecs []PipelineTaskRunSpec `json:"taskRunSpecs,omitempty"`
+	// ManagedBy indicates which controller is responsible for reconciling
+	// this resource. If unset or set to "tekton.dev/pipeline", the default
+	// Tekton controller will manage this resource.
+	// This field is immutable.
+	// +optional
+	ManagedBy *string `json:"managedBy,omitempty"`
 }
 
 // TimeoutFields allows granular specification of pipeline, task, and finally timeouts
@@ -350,6 +366,9 @@ const (
 	// PipelineRunReasonStopping indicates that no new Tasks will be scheduled by the controller, and the
 	// pipeline will stop once all running tasks complete their work
 	PipelineRunReasonStopping PipelineRunReason = "PipelineRunStopping"
+	// PipelineRunReasonTimedOutRunningFinally indicates that the tasks timeout has been exceeded
+	// and no new DAG tasks will be scheduled, but final tasks are now running
+	PipelineRunReasonTimedOutRunningFinally PipelineRunReason = "PipelineRunTimeoutRunningFinally"
 	// PipelineRunReasonCancelledRunningFinally indicates that pipeline has been gracefully cancelled
 	// and no new Tasks will be scheduled by the controller, but final tasks are now running
 	PipelineRunReasonCancelledRunningFinally PipelineRunReason = "CancelledRunningFinally"
@@ -630,7 +649,7 @@ type PipelineRunList struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []PipelineRun `json:"items,omitempty"`
+	Items           []PipelineRun `json:"items"`
 }
 
 // PipelineTaskRun reports the results of running a step in the Task. Each
