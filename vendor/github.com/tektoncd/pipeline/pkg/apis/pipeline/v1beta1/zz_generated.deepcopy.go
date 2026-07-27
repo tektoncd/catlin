@@ -956,6 +956,11 @@ func (in *PipelineRunSpec) DeepCopyInto(out *PipelineRunSpec) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.ManagedBy != nil {
+		in, out := &in.ManagedBy, &out.ManagedBy
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 
@@ -1487,7 +1492,7 @@ func (in *Provenance) DeepCopyInto(out *Provenance) {
 	if in.FeatureFlags != nil {
 		in, out := &in.FeatureFlags, &out.FeatureFlags
 		*out = new(config.FeatureFlags)
-		**out = **in
+		(*in).DeepCopyInto(*out)
 	}
 	return
 }
@@ -2586,6 +2591,11 @@ func (in *TaskRunSpec) DeepCopyInto(out *TaskRunSpec) {
 		in, out := &in.ComputeResources, &out.ComputeResources
 		*out = new(corev1.ResourceRequirements)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.ManagedBy != nil {
+		in, out := &in.ManagedBy, &out.ManagedBy
+		*out = new(string)
+		**out = **in
 	}
 	return
 }
