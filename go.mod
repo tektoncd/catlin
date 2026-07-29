@@ -11,7 +11,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	github.com/tektoncd/pipeline v1.4.0
 	github.com/tektoncd/plumbing v0.0.0-20220817140952-3da8ce01aeeb
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.28.0
 	gotest.tools v2.2.0+incompatible
 	gotest.tools/v3 v3.5.2
 	k8s.io/apimachinery v0.32.13
