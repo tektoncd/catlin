@@ -38,6 +38,7 @@ func (r *Ref) convertFrom(ctx context.Context, source v1.Ref) {
 
 func (s Step) convertTo(ctx context.Context, sink *v1.Step) {
 	sink.Name = s.Name
+	sink.DisplayName = s.DisplayName
 	sink.Image = s.Image
 	sink.Command = s.Command
 	sink.Args = s.Args
@@ -81,6 +82,7 @@ func (s Step) convertTo(ctx context.Context, sink *v1.Step) {
 
 func (s *Step) convertFrom(ctx context.Context, source v1.Step) {
 	s.Name = source.Name
+	s.DisplayName = source.DisplayName
 	s.Image = source.Image
 	s.Command = source.Command
 	s.Args = source.Args
@@ -135,9 +137,6 @@ func (s StepTemplate) convertTo(ctx context.Context, sink *v1.StepTemplate) {
 	sink.VolumeDevices = s.VolumeDevices
 	sink.ImagePullPolicy = s.ImagePullPolicy
 	sink.SecurityContext = s.SecurityContext
-	// TODO(#4546): Handle deprecated fields
-	// Name, Ports, LivenessProbe, ReadinessProbe, StartupProbe, Lifecycle, TerminationMessagePath
-	// TerminationMessagePolicy, Stdin, StdinOnce, TTY
 }
 
 func (s *StepTemplate) convertFrom(ctx context.Context, source *v1.StepTemplate) {
@@ -184,6 +183,7 @@ func (s Sidecar) convertTo(ctx context.Context, sink *v1.Sidecar) {
 		w.convertTo(ctx, &new)
 		sink.Workspaces = append(sink.Workspaces, new)
 	}
+	sink.RestartPolicy = s.RestartPolicy
 }
 
 func (s *Sidecar) convertFrom(ctx context.Context, source v1.Sidecar) {
@@ -216,4 +216,5 @@ func (s *Sidecar) convertFrom(ctx context.Context, source v1.Sidecar) {
 		new.convertFrom(ctx, w)
 		s.Workspaces = append(s.Workspaces, new)
 	}
+	s.RestartPolicy = source.RestartPolicy
 }
